@@ -1,0 +1,24 @@
+{
+  "name": "rmsb",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Lars-Erik",
+  "license": "MIT",
+  "type": "module",
+  "prettier": {
+    "semi": false,
+    "singleQuote": true
+  },
+  "devDependencies": {
+    "@types/node": "^25.2.1"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "^3.8.1",
+    "tsx": "^4.21.0"
+  }
+}
