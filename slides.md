@@ -51,8 +51,8 @@ async function getEmbedding(text: string) {
 }
 
 const likhet = cos_sim(
-  await getEmbedding('Faen det var varmt her'),
-  await getEmbedding('Den damen ser virkelig pen ut'),
+  await getEmbedding('Man høster som man sår.'),
+  await getEmbedding('Som man reder, ligger man.'),
 )
 
 console.log(`Likhet: ${likhet}`)
