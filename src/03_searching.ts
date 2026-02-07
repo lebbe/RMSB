@@ -13,22 +13,34 @@ const embeddings = JSON.parse(
   return { text, embedding: values.map(Number) }
 })
 
-console.log('Loading embedding model...')
-
-// TODO IMPLEMENT ME
+const embedder = await pipeline('feature-extraction', 'Xenova/bge-m3', {
+  device: 'auto',
+  dtype: 'q8',
+})
 
 const question = 'Hva er straffen for å rane butikken?'
 
-console.log('Generating embedding for the question...')
-
-// TODO IMPLEMENT ME
-
-console.log('Searching for relevant chunks based on cosine similarity...')
+const questionEmbedding = Array.from(
+  (
+    await embedder(question, {
+      pooling: 'mean',
+      normalize: true,
+    })
+  ).data,
+)
 
 const results: { text: string; score: number }[] = []
 
-// TODO IMPLEMENT ME
+for (let { text, embedding } of embeddings) {
+  const score = cos_sim(questionEmbedding, embedding)
+
+  if (score >= TRESHOLD) {
+    results.push({ text, score })
+  }
+}
 
 console.log('\nRelevante tekstutdrag:')
-
-// TODO IMPLEMENT ME
+const print = results.sort((a, b) => b.score - a.score).slice(0, 4)
+for (let { text, score } of print) {
+  console.log(`Troverdighet: ${(score * 100).toFixed(1)}% Tekst: ${text}`)
+}
