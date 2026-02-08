@@ -1,0 +1,50 @@
+[
+  {
+    "label": "Konge",
+    "x": 0.04,
+    "y": -0.02,
+    "z": -0.31,
+    "color": "#3498db",
+    "type": "base"
+  },
+  {
+    "label": "Mann",
+    "x": 0.4,
+    "y": 0.34,
+    "z": -0.08,
+    "color": "#95a5a6",
+    "type": "base"
+  },
+  {
+    "label": "Kvinne",
+    "x": 0.38,
+    "y": 0.06,
+    "z": 0.29,
+    "color": "#95a5a6",
+    "type": "base"
+  },
+  {
+    "label": "Dronning",
+    "x": 0.02,
+    "y": -0.24,
+    "z": -0.04,
+    "color": "#f1c40f",
+    "type": "target"
+  },
+  {
+    "label": "Resultat",
+    "x": 0.01,
+    "y": -0.31,
+    "z": 0.06,
+    "color": "#2ecc71",
+    "type": "calculated"
+  },
+  {
+    "label": "Konge - Mann",
+    "x": -0.86,
+    "y": 0.18,
+    "z": 0.07,
+    "color": "#e67e22",
+    "type": "calculated"
+  }
+]
