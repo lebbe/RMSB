@@ -81,7 +81,7 @@ console.log(`Likhet: ${likhet}`)
 
 ```bash
 npm i
-npx tsx src/00_eksempel.ts
+npx tsx src/00_eksempel_embedding.ts
 ```
 
 ---
