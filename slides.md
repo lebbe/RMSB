@@ -79,15 +79,25 @@ console.log(`Likhet: ${likhet}`)
 - Å laste ned embedding-moddelen kan ta litt tid (ca. 05. GB), så da kan jeg
   snakke litt om embedding og semantikk så lenge!
 
+```bash
+npm i
+npx tsx src/00_eksempel.ts
+```
+
 ---
 
 # Ord og semantikk
 
-- sdf
+- sparse vektor: teller opp ord "i nærheten"
+- word2vec: lag tette vektorer
+- To like vektorer ligger i "samme sted" i det flerdimensjonale rommet
+- Moderne teknologier bruker "nevrale nettverk"
+- Vi kan måle semantikken i fraser ved å legge sammen vektorene for ord!
+- Da må vi huske å normalisere først.
 
 ---
 
-# Pipeline
+# RAG: Pipeline
 
 0. Skaff et korpus vi kan bruke som kilde.
 1. Del denne opp i chunks.
