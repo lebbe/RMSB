@@ -1,6 +1,9 @@
 import { cos_sim, env, pipeline } from '@huggingface/transformers'
 env.backends.onnx.logLevel = 'error'
 
+console.log(
+  'Laster embedding-modellen. Dette kan ta litt tid første gang, så ta en kaffe eller noe.',
+)
 const embedder = await pipeline('feature-extraction', 'Xenova/bge-m3', {
   device: 'auto',
   dtype: 'q8',

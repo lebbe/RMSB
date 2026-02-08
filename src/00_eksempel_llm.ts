@@ -15,6 +15,9 @@ const systemMessage: Message = {
 
 const messageHistory: Chat = [systemMessage]
 
+console.log(
+  'Laster språk-modellen. Dette kan ta litt tid første gang, så ta en kaffe eller noe.',
+)
 const generator = await pipeline(
   'text-generation',
   'onnx-community/Qwen2.5-1.5B-Instruct',
@@ -41,7 +44,7 @@ while (true) {
   })
 
   const messageFromBot = await generator(messageHistory, {
-    max_new_tokens: 150,
+    max_new_tokens: 15,
     temperature: 1, // Lav temperatur for fakta-baserte svar
     do_sample: false,
     top_p: 0.95,
@@ -49,9 +52,13 @@ while (true) {
     streamer: streamer,
   })
 
+  const lastItem = messageFromBot[
+    messageFromBot.length - 1
+  ] as unknown as Message
+
   messageHistory.push({
-    role: 'assistant',
-    content: messageFromBot[0].toString(),
+    role: lastItem.role,
+    content: lastItem.content,
   })
 
   console.log('\n----\n')
