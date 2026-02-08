@@ -11,6 +11,17 @@ paginate: true
 
 ---
 
+# Formålet med workshoppen
+
+1. Forstå noen av de grunnleggende byggeklossene i "Chat GPT":
+   - Word embedding: Finne "semantikken" i et ord
+   - Måle likhet mellom vektorer.
+2. Forstå grunnstenene i en RAG.
+   - Finne "semantikken" til en frase/setning/chunk.
+   - Forhåndsfylle konteksten til LLMen, før den får servert spørsmålet.
+
+---
+
 # RAG: Retrieval Augmented Generation
 
 Vi hjelper en LLM til å komme med "riktig" svar ved å legge "relevante" deler av dokumenter (chunks) inn i konteksten, før den begynner å generere et svar.
@@ -62,14 +73,17 @@ console.log(`Likhet: ${likhet}`)
 
 # Oppgave 0: Embedding
 
-Lek med eksempelkoden, sjekk semantisk likhet mellom ulike fraser du måtte
-lure på.
+- Lek med eksempelkoden, sjekk semantisk likhet mellom ulike fraser du måtte
+  lure på.
+
+- Å laste ned embedding-moddelen kan ta litt tid (ca. 05. GB), så da kan jeg
+  snakke litt om embedding og semantikk så lenge!
 
 ---
 
-# Mer om RAG
+# Ord og semantikk
 
-asdf
+- sdf
 
 ---
 
@@ -129,3 +143,10 @@ lurer på inn i `question`.
 
 Lag et terminalprogram som tar i mot et spørsmål fra bruker, og
 som svarer brukeren ved hjelp av alle verktøy vi har bygd så langt.
+
+---
+
+# Going prod
+
+- **@pinecone-database/pinecone**: Vektordatabase for prod.
+- **Vertex AI Search**: Fullstendig RAG-pipeline i Google Cloud.
