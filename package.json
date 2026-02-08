@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@huggingface/transformers": "^3.8.1",
+    "ml-pca": "^4.1.1",
     "tsx": "^4.21.0"
   }
 }

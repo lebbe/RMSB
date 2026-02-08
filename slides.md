@@ -98,6 +98,112 @@ npx tsx src/00_eksempel_llm.ts
 
 ---
 
+# Aritmetikk på semantiske vektorer
+
+Har vi vektoren for "konge", "mann" og "kvinne", så kan vi regne oss frem til vektoren for "dronning".
+
+```
+  king: 'the male monarch of a kingdom',
+  b: 'a male person',
+  c: 'a female person',
+  queen: 'the female monarch of a kingdom'
+```
+
+```
+Likhet mellom "king" og "b":             0.84
+Likhet mellom "king" og "c":             0.76
+Likhet mellom "b" og "c":                0.89
+Likhet mellom "king" og "queen":         0.92
+
+Likhet mellom "king - b + c" og "queen": 0.97
+```
+
+---
+
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+<div id="vectorPlot" style="width: 800px; height: 500px; margin: 0 auto;"></div>
+
+<script>
+  // 3. Her limer du inn JSON-dataene fra TypeScript-koden din
+  const dataPoints = [
+  {
+    "label": "Konge",
+    "x": 0.04,
+    "y": -0.02,
+    "z": -0.31,
+    "color": "#3498db",
+    "type": "base"
+  },
+  {
+    "label": "Mann",
+    "x": 0.4,
+    "y": 0.34,
+    "z": -0.08,
+    "color": "#95a5a6",
+    "type": "base"
+  },
+  {
+    "label": "Kvinne",
+    "x": 0.38,
+    "y": 0.06,
+    "z": 0.29,
+    "color": "#95a5a6",
+    "type": "base"
+  },
+  {
+    "label": "Dronning",
+    "x": 0.02,
+    "y": -0.24,
+    "z": -0.04,
+    "color": "#f1c40f",
+    "type": "target"
+  },
+  {
+    "label": "Resultat",
+    "x": 0.01,
+    "y": -0.31,
+    "z": 0.06,
+    "color": "#2ecc71",
+    "type": "calculated"
+  },
+  {
+    "label": "Konge - Mann",
+    "x": -0.86,
+    "y": 0.18,
+    "z": 0.07,
+    "color": "#e67e22",
+    "type": "calculated"
+  }
+];
+
+  const trace = {
+    x: dataPoints.map(p => p.x),
+    y: dataPoints.map(p => p.y),
+    z: dataPoints.map(p => p.z),
+    mode: 'markers+text',
+    type: 'scatter3d',
+    text: dataPoints.map(p => p.label),
+    textposition: 'top center',
+    marker: { size: 8, color: dataPoints.map(p => p.color), opacity: 0.8 }
+  };
+
+  const layout = {
+    margin: {l: 0, r: 0, b: 0, t: 0},
+    scene: {
+      xaxis: {title: 'PCA 1'},
+      yaxis: {title: 'PCA 2'},
+      zaxis: {title: 'PCA 3'}
+    }
+  };
+
+  // Skjul GUI-knapper og toolbar
+  const plotlyConfig = { displayModeBar: false };
+  Plotly.newPlot('vectorPlot', [trace], layout, plotlyConfig);
+</script>
+
+---
+
 # RAG: Pipeline
 
 0. Skaff et korpus vi kan bruke som kilde.
@@ -141,6 +247,12 @@ lagrer denne sammen med chunk-teksten i en JSON-fil.
 4. `console.log` ut de chunks som "ligner" mest på spørsmålet.
 
 ---
+
+# Andre morsomme ting å bruke embedding til
+
+- Semantisk caching: I stedet for å generere det samme svaret på nytt igjen,
+  for et "semantisk" likt spørsmål, hent opp svaret fra en semantisk cache.
+- ***
 
 # Oppgave 04: Answering
 
