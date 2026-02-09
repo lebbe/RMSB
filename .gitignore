@@ -2,3 +2,4 @@ corpus
 node_modules
 fasit
 tull
+.npmrc
