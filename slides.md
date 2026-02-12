@@ -366,7 +366,7 @@ Likhet mellom "king - b + c" og "queen": 0.97
 0. Skaff et korpus vi kan bruke som kilde.
 1. Del denne opp i chunks.
 2. Lag en semantisk vektor for hver chunk.
-3. Finn chunks som er semantisk mest lik et spørsmål.
+3. Finn chunks som er semantisk mest lik et spørsmål (topp 3-5).
 4. Få en LLM til å svare på spørsmålet med utgangspunkt i chunks.
 
 ---
@@ -400,7 +400,7 @@ lagrer denne sammen med chunk-teksten i en JSON-fil.
 
 # Oppgave 03: Searching
 
-1. Les inn alle embeddings lagd i Oppgave 4.
+1. Les inn alle embeddings lagd i Oppgave 2.
 2. Lag en embedding for et spørsmål `question`.
 3. Mål kosinus-likhet mellom spørsmålet og alle chunks med `cos_sim`.
 4. `console.log` ut de chunks som "ligner" mest på spørsmålet, for eksempel topp 4.
@@ -412,7 +412,7 @@ lagrer denne sammen med chunk-teksten i en JSON-fil.
 - Semantisk caching: I stedet for å generere det samme svaret på nytt igjen,
   for et "semantisk" likt spørsmål, hent opp svaret fra en semantisk cache.
 - Finn duplicate support-tickets, bug-rapporter, etc.
-- Anebfalingssystemer: Link til artikler med chunks som er "lik" chunks i denne artikkelen.
+- Anbefalingssystemer: Link til artikler med chunks som er "lik" chunks i denne artikkelen.
 - Automatisk kategorisering av eposter, tickets, etc.
 
 ---

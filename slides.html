@@ -337,7 +337,7 @@ Likhet mellom &quot;king - b + c&quot; og &quot;queen&quot;: 0.97
 <li>Skaff et korpus vi kan bruke som kilde.</li>
 <li>Del denne opp i chunks.</li>
 <li>Lag en semantisk vektor for hver chunk.</li>
-<li>Finn chunks som er semantisk mest lik et spørsmål.</li>
+<li>Finn chunks som er semantisk mest lik et spørsmål (topp 3-5).</li>
 <li>Få en LLM til å svare på spørsmålet med utgangspunkt i chunks.</li>
 </ol>
 </section>
@@ -366,7 +366,7 @@ lagrer denne sammen med chunk-teksten i en JSON-fil.</p>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="23" data-class="invert" data-paginate="true" data-theme="default" lang="en-US" class="invert" data-marpit-pagination="23" style="--class:invert;--paginate:true;--theme:default;" data-marpit-pagination-total="27">
 <h1 id="oppgave-03-searching">Oppgave 03: Searching</h1>
 <ol>
-<li>Les inn alle embeddings lagd i Oppgave 4.</li>
+<li>Les inn alle embeddings lagd i Oppgave 2.</li>
 <li>Lag en embedding for et spørsmål <code>question</code>.</li>
 <li>Mål kosinus-likhet mellom spørsmålet og alle chunks med <code>cos_sim</code>.</li>
 <li><code>console.log</code> ut de chunks som &quot;ligner&quot; mest på spørsmålet, for eksempel topp 4.</li>
@@ -378,7 +378,7 @@ lagrer denne sammen med chunk-teksten i en JSON-fil.</p>
 <li>Semantisk caching: I stedet for å generere det samme svaret på nytt igjen,<br />
 for et &quot;semantisk&quot; likt spørsmål, hent opp svaret fra en semantisk cache.</li>
 <li>Finn duplicate support-tickets, bug-rapporter, etc.</li>
-<li>Anebfalingssystemer: Link til artikler med chunks som er &quot;lik&quot; chunks i denne artikkelen.</li>
+<li>Anbefalingssystemer: Link til artikler med chunks som er &quot;lik&quot; chunks i denne artikkelen.</li>
 <li>Automatisk kategorisering av eposter, tickets, etc.</li>
 </ul>
 </section>
