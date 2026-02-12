@@ -4,6 +4,7 @@ theme: default
 class: invert
 paginate: true
 math: mathjax
+author: Lars-Erik Bruce
 ---
 
 # RAG med strikk og binders i TypeScript
@@ -15,11 +16,11 @@ math: mathjax
 # Formålet med workshoppen
 
 1. Forstå én av de grunnleggende byggeklossene i store språkmodeller:
-   - Word embedding: Finne "semantikken" i et ord
+   - Word embedding: Finne "semantikken" (meningen) i et ord
    - Vektorsemantikk: Måle (semantisk) likhet mellom vektorer.
 2. Ha kunnskapen som skal til for å lage egen RAG.
-   - Finne "semantikken" til en frase/setning/chunk.
-   - Slå opp chunks med lignende "mening"
+   - Finne "semantikken" til et innsendt spørsmål (prompt).
+   - Slå opp chunks/fraser/dokumenter med lignende "mening"
    - Forhåndsfylle konteksten til LLMen med disse, før den får servert spørsmålet.
 
 ---
@@ -48,6 +49,23 @@ Jobber nå, blant annet, med å fasilitere agentisk AI på kundeservice hos Tele
 - To setninger som betyr omtrent det samme, får ca samme vektor.
 
 **Vi skal se grundig og akademisk på hvordan dette fungerer, _etter_ en liten praktisk øvelse.**
+
+---
+
+# Måling av semantisk likhet: Kosinus-likhet
+
+- Kosinus-likhet måler vinkelen mellom to vektorer (ikke avstanden!)
+- Verdier fra -1 (motsatt) til 1 (identisk), 0 = ortogonal
+- Formel: cos(θ) = (A · B) / (||A|| × ||B||)
+
+**Hvorfor ikke Euklidisk avstand?**
+
+- Kosinus ignorerer lengden på vektorer, fokuserer på retning
+- "Katt er et dyr" og "Katter er dyr" bør være like, selv om lengden er forskjellig
+
+```TypeScript
+import { cos_sim } from '@huggingface/transformers'
+```
 
 ---
 
@@ -170,7 +188,6 @@ for å modellere ord, MEN: Utrolig glissent! Veldig mange nuller.
 
 ## Hvordan kan en vektor (array med flyttall) representere meningen i et ord eller en setning?
 
-
 <table>
   <tr>
     <td></td>
@@ -237,37 +254,31 @@ Vi ser at ordene "digital" og "information" er nærme hverandre semantisk. Så o
 
 ## Hvordan kan en vektor (array med flyttall) representere meningen i et ord eller en setning?
 
-1. I gamle dager brukte vi altså glissne vektorer for å modellere semantikken til et ord.
+1. I gamle dager brukte vi altså glissne vektorer (mange nuller!) for å modellere semantikken til et ord.
 2. I stedet kan vi benytte oss av embedding: Kort vektor for å representere et ord.
 3. For eksempel word2vec!
 
-
 ---
 
 # word2vec
-
-```
-[0.12, ]
-```
 
 I stedet for en gigantisk vektor, med like mange celler som det er ord i språket, lager vi en vilkårlig kort vektor (si 200) fylt med tilfeldige tall per ord.
 
-Så benyttes en algoritme for å få "semantisk like ord" til å "ligge nærme hverandre" i et vector-rom.
+word2vec bruker et nevralt nettverk som lærer å predikere kontekst-ord fra target-ord (eller omvendt), og vektorene er en bieffekt av denne læringen.
 
-Semantisk likt: De opptrer inntil hverandre i en tekst!
+Dette er en eldre metode - dagens modeller (som vi bruker i oppgavene) er mer sofistikerte.
 
 ---
 
+# Semantisk likhet mellom ord
 
-# word2vec
+Hvordan kan det at ord opptrer nærme hverandre kan bli semantisk like? La oss se på "katt" og "hund".
 
-Hvordan kan det at ord opptrer inntil hverandre kan bli semantisk like? La oss se på "katt" og "hund".
-
-* Gutten klappet katten.
-* Gutten klappet hunden.
-* Hunden løp etter ballen.
-* Katten løp etter musen.
-* ....
+- Gutten klappet katten.
+- Gutten klappet hunden.
+- Hunden løp etter ballen.
+- Katten løp etter musen.
+- ....
 
 Over tid, i et stort nok korpus, vil "hund" og "katt" være mer lik hverandre, enn ordene de opptrer sammen med.
 
@@ -277,10 +288,9 @@ Over tid, i et stort nok korpus, vil "hund" og "katt" være mer lik hverandre, e
 
 - Moderne teknologier (embedding-modeller) bruker "nevrale nettverk" for å lage vektorer.
 - De fungerer best om de opererer over fraser: Bruker kontekst for å skille mellom:
-  * Jeg skal gi deg _bank_.
-  * Jeg skal gå til en _bank_.
+  - Jeg skal gi deg _bank_.
+  - Jeg skal gå til en _bank_.
 - De spytter ut en vektor per _token_.
-
 
 ---
 
@@ -292,10 +302,8 @@ Over tid, i et stort nok korpus, vil "hund" og "katt" være mer lik hverandre, e
 
 # Aritmetikk på semantiske vektorer (1)
 
-
 - Vi kan måle semantikken i _fraser_ ved å legge sammen vektorene for ord!
 - Da må vi huske å normalisere: Avstand fra origo til hvert punkt (token) er like langt.
-
 
 <object data="normalisering.html" type="text/html" width="100%" height="60%">
   Åpne <a href="normalisering.html">normalisering.html</a> i eget vindu.
@@ -308,7 +316,6 @@ Over tid, i et stort nok korpus, vil "hund" og "katt" være mer lik hverandre, e
 Gitt vektorerene for ordene **a**, **male** og **person**:
 
 $$\text{vektor for frasen} = \frac{\mathbf{a} + \mathbf{b} + \mathbf{c}}{n}$$
-
 
 ```
 [0.12, 0.34, -0.23, 0.15, ...] + [0.40, 0.20, -0.34, 0.08, ...] + [0.18, 0.25, -0.19, 0.12, ...]
@@ -323,7 +330,6 @@ $$\text{vektor for frasen} = \frac{\mathbf{a} + \mathbf{b} + \mathbf{c}}{n}$$
 ```
 
 Den normaliserte sammensatte vektoren representerer den semantiske betydningen av alle tre ordene sammen!
-
 
 ---
 
@@ -349,7 +355,6 @@ Likhet mellom "king - b + c" og "queen": 0.97
 
 ---
 
-
 <object data="syntetisk_dronning.html" type="text/html" width="100%" height="100%">
   Åpne <a href="syntetisk_dronning.html">syntetisk_dronning.html</a> i eget vindu.
 </object>
@@ -371,6 +376,8 @@ Likhet mellom "king - b + c" og "queen": 0.97
 1. Finn et større dokument du vil bruke som kilde.
 2. Lagre denne som en .txt fil i `corpus`
 3. Lag chunks av denne ved å fullføre koden i `01_chunking.ts`
+
+**Tips:** Typisk chunk-størrelse er 256-512 tokens med ~10% overlap for bedre resultat.
 
 ---
 
@@ -396,7 +403,7 @@ lagrer denne sammen med chunk-teksten i en JSON-fil.
 1. Les inn alle embeddings lagd i Oppgave 4.
 2. Lag en embedding for et spørsmål `question`.
 3. Mål kosinus-likhet mellom spørsmålet og alle chunks med `cos_sim`.
-4. `console.log` ut de chunks som "ligner" mest på spørsmålet.
+4. `console.log` ut de chunks som "ligner" mest på spørsmålet, for eksempel topp 4.
 
 ---
 
@@ -404,7 +411,11 @@ lagrer denne sammen med chunk-teksten i en JSON-fil.
 
 - Semantisk caching: I stedet for å generere det samme svaret på nytt igjen,
   for et "semantisk" likt spørsmål, hent opp svaret fra en semantisk cache.
-- ***
+- Finn duplicate support-tickets, bug-rapporter, etc.
+- Anebfalingssystemer: Link til artikler med chunks som er "lik" chunks i denne artikkelen.
+- Automatisk kategorisering av eposter, tickets, etc.
+
+---
 
 # Oppgave 04: Answering
 
