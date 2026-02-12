@@ -434,8 +434,11 @@ som svarer brukeren ved hjelp av alle verktøy vi har bygd så langt.
 
 # Going prod
 
-- **@pinecone-database/pinecone**: Vektordatabase for prod.
-- **Vertex AI Search**: Fullstendig RAG-pipeline i Google Cloud.
+- **pinecone / Weaviate / Qdrant**: Vector-databaser
+- **pgvector**: Postgres-utvidelse hvis du allerede bruker Postgres
+- **Vertex AI Search / Azure AI Search**: Fullstendige managed løsninger
+- **Hybrid search**: Kombiner semantisk + keyword (BM25) for bedre recall
+- **Reranking**: Re-rank top-k med en annen modell for økt presisjon
 
 # Kilder
 

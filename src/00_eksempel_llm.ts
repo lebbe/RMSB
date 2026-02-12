@@ -38,13 +38,17 @@ const rl = readline.createInterface({ input, output })
 while (true) {
   const newMessage = await rl.question('Du skriver: ')
 
+  if (newMessage.includes('exit()')) {
+    process.exit(0)
+  }
+
   messageHistory.push({
     role: 'user',
     content: newMessage,
   })
 
   const messageFromBot = await generator(messageHistory, {
-    max_new_tokens: 15,
+    max_new_tokens: 35,
     temperature: 1, // Lav temperatur for fakta-baserte svar
     do_sample: false,
     top_p: 0.95,
