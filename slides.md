@@ -3,6 +3,7 @@ marp: true
 theme: default
 class: invert
 paginate: true
+math: mathjax
 ---
 
 # RAG med strikk og binders i TypeScript
@@ -13,31 +14,40 @@ paginate: true
 
 # Formålet med workshoppen
 
-1. Forstå noen av de grunnleggende byggeklossene i "Chat GPT":
+1. Forstå én av de grunnleggende byggeklossene i store språkmodeller:
    - Word embedding: Finne "semantikken" i et ord
-   - Måle likhet mellom vektorer.
-2. Forstå grunnstenene i en RAG.
+   - Vektorsemantikk: Måle (semantisk) likhet mellom vektorer.
+2. Ha kunnskapen som skal til for å lage egen RAG.
    - Finne "semantikken" til en frase/setning/chunk.
-   - Forhåndsfylle konteksten til LLMen, før den får servert spørsmålet.
+   - Slå opp chunks med lignende "mening"
+   - Forhåndsfylle konteksten til LLMen med disse, før den får servert spørsmålet.
+
+---
+
+# Om Lars-Erik Bruce
+
+Skrevet en masteroppgave innen språkteknologier: "Ontology-driven information extraction and structuring in the clinical domain".
+
+Jobber nå, blant annet, med å fasilitere agentisk AI på kundeservice hos Telenor.
 
 ---
 
 # RAG: Retrieval Augmented Generation
 
-Vi hjelper en LLM til å komme med "riktig" svar ved å legge "relevante" deler av dokumenter (chunks) inn i konteksten, før den begynner å generere et svar.
+- Vi hjelper en LLM til å komme med "riktig" svar ved å legge "relevante" deler av dokumenter (chunks) inn i konteksten, før den begynner å generere et svar.
+- For å finne "relevant" del av dokumentet i dag, brukes gjerne embedding-modeller: Vi måler semantisk avstand mellom embeddingsvektoren for spørsmålet og embeddingsvektoren for små deler (chunks) av dokumenter.
+- Embedding-modeller er også brukt i språkmodeller: Ordene vi skriver til Chat GPT blir gjort om til vektorer, før "hjernen" til Chat GPT behandler setningene videre.
 
 ---
 
 # Embeddingsmodeller
 
-- Input: Diskrete data som setninger eller bilder.
-- Output: En vektor med flyttall, som representerer semantisk mening.
+- Input: Vi stapper en frase eller setning inn i modellen.
+- Output: En vektor (array med flyttall), som representerer frasens "semantiske mening".
 - (Egentlig: En vektor per ord/token, som blir normalisert.)
 - To setninger som betyr omtrent det samme, får ca samme vektor.
 
-## "Det var en gang et menneske."
-
-[0.123213, 0.7563456, 0.3452345, 0.32453245, -0.873784, 0.000123, ...]
+**Vi skal se grundig og akademisk på hvordan dette fungerer, _etter_ en liten praktisk øvelse.**
 
 ---
 
@@ -73,6 +83,8 @@ console.log(`Likhet: ${likhet}`)
 
 # Oppgave 0: Embedding
 
+- `git checkout https://github.com/lebbe/RMSB.git`
+
 - Lek med eksempelkoden, sjekk semantisk likhet mellom ulike fraser du måtte
   lure på.
 
@@ -89,228 +101,247 @@ npx tsx src/00_eksempel_llm.ts
 
 # Ord og semantikk
 
-- sparse vektor: teller opp ord "i nærheten"
-- word2vec: lag tette vektorer
-- To like vektorer ligger i "samme sted" i det flerdimensjonale rommet
-- Moderne teknologier bruker "nevrale nettverk"
-- Vi kan måle semantikken i fraser ved å legge sammen vektorene for ord!
-- Da må vi huske å normalisere først.
+## Hvordan kan en vektor representere meningen i et ord eller en setning?
+
+<table>
+  <tr>
+    <td></td>
+    <td>Aardvark</td>
+    <td>...</td>
+    <td>computer</td>
+    <td>data</td>
+    <td>result</td>
+    <td>pie</td>
+    <td>sugar</td>
+    <td>...</td>
+  </tr>
+  <tr>
+    <td>cherry</td>
+    <td>0</td>
+    <td>...</td>
+    <td>2</td>
+    <td>8</td>
+    <td>9</td>
+    <td class="red">442</td>
+    <td>25</td>
+    <td>...</td>
+  </tr>
+  <tr>
+    <td>strawberry</td>
+    <td>0</td>
+    <td>...</td>
+    <td>0</td>
+    <td>0</td>
+    <td>1</td>
+    <td>60</td>
+    <td>19</td>
+    <td>...</td>
+  </tr>
+  <tr>
+    <td>digital</td>
+    <td>0</td>
+    <td>...</td>
+    <td>1670</td>
+    <td>1683</td>
+    <td>85</td>
+    <td>5</td>
+    <td>4</td>
+    <td>...</td>
+  </tr>
+  <tr>
+    <td>information</td>
+    <td>0</td>
+    <td>...</td>
+    <td>3325</td>
+    <td>3982</td>
+    <td>378</td>
+    <td>5</td>
+    <td>13</td>
+    <td>...</td>
+  </tr>
+</table>
+
+Frekvens av ord som opptrer sammen i dokumenter i Wikipedia. Disse kan brukes
+for å modellere ord, MEN: Utrolig glissent! Veldig mange nuller.
 
 ---
 
-<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+# Ord og semantikk
 
-<div id="vectorPlot" style="width: 800px; height: 500px; margin: 0 auto;"></div>
+## Hvordan kan en vektor (array med flyttall) representere meningen i et ord eller en setning?
 
-<script>
-  // 3. Her limer du inn JSON-dataene fra TypeScript-koden din
-  const dataPoints = [
-  {
-    "label": "apple",
-    "x": 0,
-    "y": -0.2,
-    "z": 0.02,
-    "color": "#3498db",
-    "type": "noun"
-  },
-  {
-    "label": "banana",
-    "x": 0.02,
-    "y": -0.08,
-    "z": 0.05,
-    "color": "#3498db",
-    "type": "noun"
-  },
-  {
-    "label": "car",
-    "x": 0.07,
-    "y": -0.18,
-    "z": -0.04,
-    "color": "#3498db",
-    "type": "noun"
-  },
-  {
-    "label": "house",
-    "x": 0.03,
-    "y": -0.11,
-    "z": 0.06,
-    "color": "#3498db",
-    "type": "noun"
-  },
-  {
-    "label": "dog",
-    "x": -0.05,
-    "y": -0.14,
-    "z": -0.03,
-    "color": "#3498db",
-    "type": "noun"
-  },
-  {
-    "label": "cat",
-    "x": 0.02,
-    "y": -0.15,
-    "z": -0.06,
-    "color": "#3498db",
-    "type": "noun"
-  },
-  {
-    "label": "friendship",
-    "x": -0.18,
-    "y": 0,
-    "z": 0.14,
-    "color": "#3498db",
-    "type": "noun"
-  },
-  {
-    "label": "sadness",
-    "x": -0.27,
-    "y": 0.05,
-    "z": -0.02,
-    "color": "#3498db",
-    "type": "noun"
-  },
-  {
-    "label": "computer",
-    "x": -0.03,
-    "y": -0.14,
-    "z": -0.08,
-    "color": "#3498db",
-    "type": "noun"
-  },
-  {
-    "label": "happiness",
-    "x": -0.24,
-    "y": 0.04,
-    "z": 0.12,
-    "color": "#3498db",
-    "type": "noun"
-  },
-  {
-    "label": "run",
-    "x": 0.18,
-    "y": 0.07,
-    "z": 0.03,
-    "color": "#e67e22",
-    "type": "verb"
-  },
-  {
-    "label": "jump",
-    "x": 0.16,
-    "y": 0.11,
-    "z": 0.23,
-    "color": "#e67e22",
-    "type": "verb"
-  },
-  {
-    "label": "eat",
-    "x": 0.09,
-    "y": 0.09,
-    "z": -0.17,
-    "color": "#e67e22",
-    "type": "verb"
-  },
-  {
-    "label": "sleep",
-    "x": -0.03,
-    "y": 0.03,
-    "z": 0.09,
-    "color": "#e67e22",
-    "type": "verb"
-  },
-  {
-    "label": "drive",
-    "x": 0.16,
-    "y": -0.03,
-    "z": -0.01,
-    "color": "#e67e22",
-    "type": "verb"
-  },
-  {
-    "label": "swim",
-    "x": 0.12,
-    "y": 0.21,
-    "z": 0.08,
-    "color": "#e67e22",
-    "type": "verb"
-  },
-  {
-    "label": "think",
-    "x": 0.03,
-    "y": 0.08,
-    "z": -0.17,
-    "color": "#e67e22",
-    "type": "verb"
-  },
-  {
-    "label": "laugh",
-    "x": -0.11,
-    "y": 0.17,
-    "z": -0.03,
-    "color": "#e67e22",
-    "type": "verb"
-  },
-  {
-    "label": "cry",
-    "x": -0.09,
-    "y": 0.15,
-    "z": -0.19,
-    "color": "#e67e22",
-    "type": "verb"
-  },
-  {
-    "label": "build",
-    "x": 0.12,
-    "y": 0.04,
-    "z": -0.04,
-    "color": "#e67e22",
-    "type": "verb"
-  }
-];
 
-  const trace = {
-    x: dataPoints.map(p => p.x),
-    y: dataPoints.map(p => p.y),
-    z: dataPoints.map(p => p.z),
-    mode: 'markers+text',
-    type: 'scatter3d',
-    text: dataPoints.map(p => p.label),
-    textposition: 'top center',
-    marker: { size: 8, color: dataPoints.map(p => p.color), opacity: 0.8 }
-  };
+<table>
+  <tr>
+    <td></td>
+    <td>Aardvark</td>
+    <td>...</td>
+    <td>computer</td>
+    <td>data</td>
+    <td>result</td>
+    <td>pie</td>
+    <td>sugar</td>
+    <td>...</td>
+  </tr>
+  <tr>
+    <td>cherry</td>
+    <td>0</td>
+    <td>...</td>
+    <td>2</td>
+    <td>8</td>
+    <td>9</td>
+    <td style="background: #c35">442</td>
+    <td style="background: #c35">25</td>
+    <td>...</td>
+  </tr>
+  <tr>
+    <td>strawberry</td>
+    <td>0</td>
+    <td>...</td>
+    <td>0</td>
+    <td>0</td>
+    <td>1</td>
+    <td style="background: #c35">60</td>
+    <td style="background: #c35">19</td>
+    <td>...</td>
+  </tr>
+  <tr>
+    <td>digital</td>
+    <td>0</td>
+    <td>...</td>
+    <td style="background: #35c">1670</td>
+    <td style="background: #35c">1683</td>
+    <td style="background: #35c">85</td>
+    <td>5</td>
+    <td>4</td>
+    <td>...</td>
+  </tr>
+  <tr>
+    <td>information</td>
+    <td>0</td>
+    <td>...</td>
+    <td style="background: #35c">3325</td>
+    <td style="background: #35c">3982</td>
+    <td style="background: #35c">378</td>
+    <td>5</td>
+    <td>13</td>
+    <td>...</td>
+  </tr>
+</table>
 
-  const layout = {
-    margin: {l: 0, r: 0, b: 0, t: 0},
-    scene: {
-      xaxis: {title: 'PCA 1'},
-      yaxis: {title: 'PCA 2'},
-      zaxis: {title: 'PCA 3'}
-    }
-  };
-
-  // Skjul GUI-knapper og toolbar
-  const plotlyConfig = { displayModeBar: false };
-  Plotly.newPlot('vectorPlot', [trace], layout, plotlyConfig);
-</script>
+Vi ser at ordene "digital" og "information" er nærme hverandre semantisk. Så også "cherry" og "strawberry".
 
 ---
 
+# Ord og semantikk
+
+## Hvordan kan en vektor (array med flyttall) representere meningen i et ord eller en setning?
+
+1. I gamle dager brukte vi altså glissne vektorer for å modellere semantikken til et ord.
+2. I stedet kan vi benytte oss av embedding: Kort vektor for å representere et ord.
+3. For eksempel word2vec!
+
+
 ---
 
-# Aritmetikk på semantiske vektorer
+# word2vec
+
+```
+[0.12, ]
+```
+
+I stedet for en gigantisk vektor, med like mange celler som det er ord i språket, lager vi en vilkårlig kort vektor (si 200) fylt med tilfeldige tall per ord.
+
+Så benyttes en algoritme for å få "semantisk like ord" til å "ligge nærme hverandre" i et vector-rom.
+
+Semantisk likt: De opptrer inntil hverandre i en tekst!
+
+---
+
+
+# word2vec
+
+Hvordan kan det at ord opptrer inntil hverandre kan bli semantisk like? La oss se på "katt" og "hund".
+
+* Gutten klappet katten.
+* Gutten klappet hunden.
+* Hunden løp etter ballen.
+* Katten løp etter musen.
+* ....
+
+Over tid, i et stort nok korpus, vil "hund" og "katt" være mer lik hverandre, enn ordene de opptrer sammen med.
+
+---
+
+# Mer om vektor-semantikk
+
+- Moderne teknologier (embedding-modeller) bruker "nevrale nettverk" for å lage vektorer.
+- De fungerer best om de opererer over fraser: Bruker kontekst for å skille mellom:
+  * Jeg skal gi deg _bank_.
+  * Jeg skal gå til en _bank_.
+- De spytter ut en vektor per _token_.
+
+
+---
+
+<object data="ord.html" type="text/html" width="100%" height="100%">
+  Åpne <a href="ord.html">ord.html</a> i eget vindu.
+</object>
+
+---
+
+# Aritmetikk på semantiske vektorer (1)
+
+
+- Vi kan måle semantikken i _fraser_ ved å legge sammen vektorene for ord!
+- Da må vi huske å normalisere: Avstand fra origo til hvert punkt (token) er like langt.
+
+
+<object data="normalisering.html" type="text/html" width="100%" height="60%">
+  Åpne <a href="normalisering.html">normalisering.html</a> i eget vindu.
+</object>
+
+---
+
+# Aritmetikk på semantiske vektorer (2)
+
+Gitt vektorerene for ordene **a**, **male** og **person**:
+
+$$\text{vektor for frasen} = \frac{\mathbf{a} + \mathbf{b} + \mathbf{c}}{n}$$
+
+
+```
+[0.12, 0.34, -0.23, 0.15, ...] + [0.40, 0.20, -0.34, 0.08, ...] + [0.18, 0.25, -0.19, 0.12, ...]
+
+[0.12 + 0.40 + 0.18, 0.34 + 0.20 + 0.25, -0.23 - 0.34 - 0.19, ...]
+
+=
+
+[0.70, 0.79, -0.76, 0.35, ...]  / 3 =
+
+[0.23, 0.26, -0.25, 0.12, ...]
+```
+
+Den normaliserte sammensatte vektoren representerer den semantiske betydningen av alle tre ordene sammen!
+
+
+---
+
+# Aritmetikk på semantiske vektorer (3)
 
 Har vi vektoren for "konge", "mann" og "kvinne", så kan vi regne oss frem til vektoren for "dronning".
 
 ```
-  king: 'the male monarch of a kingdom',
-  b: 'a male person',
-  c: 'a female person',
-  queen: 'the female monarch of a kingdom'
+  king:   'the male monarch of a kingdom',
+  male:   'a male person',
+  female: 'a female person',
+  queen:  'the female monarch of a kingdom'
 ```
 
 ```
-Likhet mellom "king" og "b":             0.84
-Likhet mellom "king" og "c":             0.76
-Likhet mellom "b" og "c":                0.89
+Likhet mellom "king" og "male":          0.84
+Likhet mellom "king" og "female":        0.76
+Likhet mellom "male" og "female":        0.89
 Likhet mellom "king" og "queen":         0.92
 
 Likhet mellom "king - b + c" og "queen": 0.97
@@ -318,87 +349,10 @@ Likhet mellom "king - b + c" og "queen": 0.97
 
 ---
 
-<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
 
-<div id="vectorPlot" style="width: 800px; height: 500px; margin: 0 auto;"></div>
-
-<script>
-  // 3. Her limer du inn JSON-dataene fra TypeScript-koden din
-  const dataPoints = [
-  {
-    "label": "Konge",
-    "x": 0.04,
-    "y": -0.02,
-    "z": -0.31,
-    "color": "#3498db",
-    "type": "base"
-  },
-  {
-    "label": "Mann",
-    "x": 0.4,
-    "y": 0.34,
-    "z": -0.08,
-    "color": "#95a5a6",
-    "type": "base"
-  },
-  {
-    "label": "Kvinne",
-    "x": 0.38,
-    "y": 0.06,
-    "z": 0.29,
-    "color": "#95a5a6",
-    "type": "base"
-  },
-  {
-    "label": "Dronning",
-    "x": 0.02,
-    "y": -0.24,
-    "z": -0.04,
-    "color": "#f1c40f",
-    "type": "target"
-  },
-  {
-    "label": "Resultat",
-    "x": 0.01,
-    "y": -0.31,
-    "z": 0.06,
-    "color": "#2ecc71",
-    "type": "calculated"
-  },
-  {
-    "label": "Konge - Mann",
-    "x": -0.86,
-    "y": 0.18,
-    "z": 0.07,
-    "color": "#e67e22",
-    "type": "calculated"
-  }
-];
-
-  const trace = {
-    x: dataPoints.map(p => p.x),
-    y: dataPoints.map(p => p.y),
-    z: dataPoints.map(p => p.z),
-    mode: 'markers+text',
-    type: 'scatter3d',
-    text: dataPoints.map(p => p.label),
-    textposition: 'top center',
-    marker: { size: 8, color: dataPoints.map(p => p.color), opacity: 0.8 }
-  };
-
-  const layout = {
-    margin: {l: 0, r: 0, b: 0, t: 0},
-    scene: {
-      xaxis: {title: 'PCA 1'},
-      yaxis: {title: 'PCA 2'},
-      zaxis: {title: 'PCA 3'}
-    }
-  };
-
-  // Skjul GUI-knapper og toolbar
-  const plotlyConfig = { displayModeBar: false };
-  Plotly.newPlot('vectorPlot', [trace], layout, plotlyConfig);
-</script>
+<object data="syntetisk_dronning.html" type="text/html" width="100%" height="100%">
+  Åpne <a href="syntetisk_dronning.html">syntetisk_dronning.html</a> i eget vindu.
+</object>
 
 ---
 
@@ -471,3 +425,7 @@ som svarer brukeren ved hjelp av alle verktøy vi har bygd så langt.
 
 - **@pinecone-database/pinecone**: Vektordatabase for prod.
 - **Vertex AI Search**: Fullstendig RAG-pipeline i Google Cloud.
+
+# Kilder
+
+- https://web.stanford.edu/~jurafsky/slp3/

@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Normalisering av Vektorer</title>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html, body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background-color: #1e1e1e;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        color: #ffffff;
+      }
+      #vectorPlot {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="vectorPlot"></div>
+
+    <script>
+      // Ikke normaliserte vektorer
+      const unnormalized = [
+        { x: 1.5, y: 0.8, label: 'Vektor A', color: '#3498db' },
+        { x: 2.2, y: 1.5, label: 'Vektor B', color: '#3498db' },
+        { x: 0.9, y: 2.1, label: 'Vektor C', color: '#3498db' },
+        { x: 1.2, y: -0.5, label: 'Vektor D', color: '#3498db' },
+      ]
+
+      // Normaliserte vektorer (samme retning, men på enhetssirkelen)
+      const normalized = [
+        { x: 0.87, y: 0.49, label: 'Vektor A (norm)', color: '#2ecc71' },
+        { x: 0.83, y: 0.56, label: 'Vektor B (norm)', color: '#2ecc71' },
+        { x: 0.39, y: 0.92, label: 'Vektor C (norm)', color: '#2ecc71' },
+        { x: 0.92, y: -0.39, label: 'Vektor D (norm)', color: '#2ecc71' },
+      ]
+
+      // Origo
+      const origin = { x: 0, y: 0, label: 'Origo', color: '#e74c3c' }
+
+      // Gjør lister med data for hvert punkt
+      const allPoints = [...unnormalized, ...normalized, origin]
+
+      // Lag traces for hvert punkt
+      const traces = allPoints.map((point) => ({
+        x: [point.x],
+        y: [point.y],
+        mode: 'markers+text',
+        type: 'scatter',
+        marker: {
+          size: point === origin ? 15 : 12,
+          color: point.color,
+          opacity: 0.8,
+          line: {
+            color: 'white',
+            width: 2,
+          },
+        },
+        text: [point.label],
+        textposition: 'top center',
+        textfont: {
+          size: 10,
+          color: '#ffffff',
+        },
+        name: point.label,
+        hovertemplate:
+          '<b>%{text}</b><br>x: %{x:.2f}<br>y: %{y:.2f}<extra></extra>',
+      }))
+
+      // Tegn linjer fra origo til alle punkter for å vise retning
+      const lineTraces = [...unnormalized, ...normalized].map((point) => ({
+        x: [0, point.x],
+        y: [0, point.y],
+        mode: 'lines',
+        type: 'scatter',
+        line: {
+          color: point.color,
+          width: 1,
+          dash: point.color === '#2ecc71' ? 'dash' : 'solid',
+        },
+        hoverinfo: 'skip',
+        showlegend: false,
+      }))
+
+      // Tegn enhetssirkelen for å vise normalisering
+      const circlePoints = []
+      for (let i = 0; i <= 360; i += 5) {
+        const rad = (i * Math.PI) / 180
+        circlePoints.push({
+          x: Math.cos(rad),
+          y: Math.sin(rad),
+        })
+      }
+
+      const circleTrace = {
+        x: circlePoints.map((p) => p.x),
+        y: circlePoints.map((p) => p.y),
+        mode: 'lines',
+        type: 'scatter',
+        line: {
+          color: 'rgba(200, 200, 200, 0.3)',
+          width: 1,
+          dash: 'dot',
+        },
+        name: 'Enhetssirkel',
+        hoverinfo: 'skip',
+        showlegend: false,
+      }
+
+      const layout = {
+        xaxis: {
+          title: 'X-akse',
+          zeroline: true,
+          zerolinecolor: 'rgba(255, 255, 255, 0.2)',
+          color: '#ffffff',
+          gridcolor: 'rgba(255, 255, 255, 0.1)',
+          range: [-2.5, 2.5],
+        },
+        yaxis: {
+          title: 'Y-akse',
+          zeroline: true,
+          zerolinecolor: 'rgba(255, 255, 255, 0.2)',
+          color: '#ffffff',
+          gridcolor: 'rgba(255, 255, 255, 0.1)',
+          range: [-2.5, 2.5],
+          scaleanchor: 'x',
+          scaleratio: 1,
+        },
+        plot_bgcolor: '#2d2d2d',
+        paper_bgcolor: '#1e1e1e',
+        font: { color: '#ffffff' },
+        hovermode: 'closest',
+        showlegend: false,
+        margin: { l: 0, r: 0, b: 0, t: 0 },
+      }
+
+      const config = { displayModeBar: false, responsive: true }
+
+      Plotly.newPlot(
+        'vectorPlot',
+        [...lineTraces, circleTrace, ...traces],
+        layout,
+        config,
+      )
+    </script>
+  </body>
+</html>

@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ord Visualisering</title>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+  </head>
+  <body>
+    <div
+      id="vectorPlot"
+      style="width: 800px; height: 500px; margin: 0 auto"
+    ></div>
+
+    <script>
+      let dataPoints = [
+        {
+          label: 'apple',
+          x: 0,
+          y: -0.2,
+          z: 0.02,
+          color: '#3498db',
+          type: 'noun',
+        },
+        {
+          label: 'banana',
+          x: 0.02,
+          y: -0.08,
+          z: 0.05,
+          color: '#3498db',
+          type: 'noun',
+        },
+        {
+          label: 'car',
+          x: 0.07,
+          y: -0.18,
+          z: -0.04,
+          color: '#3498db',
+          type: 'noun',
+        },
+        {
+          label: 'house',
+          x: 0.03,
+          y: -0.11,
+          z: 0.06,
+          color: '#3498db',
+          type: 'noun',
+        },
+        {
+          label: 'dog',
+          x: -0.05,
+          y: -0.14,
+          z: -0.03,
+          color: '#3498db',
+          type: 'noun',
+        },
+        {
+          label: 'cat',
+          x: 0.02,
+          y: -0.15,
+          z: -0.06,
+          color: '#3498db',
+          type: 'noun',
+        },
+        {
+          label: 'friendship',
+          x: -0.18,
+          y: 0,
+          z: 0.14,
+          color: '#3498db',
+          type: 'noun',
+        },
+        {
+          label: 'sadness',
+          x: -0.27,
+          y: 0.05,
+          z: -0.02,
+          color: '#3498db',
+          type: 'noun',
+        },
+        {
+          label: 'computer',
+          x: -0.03,
+          y: -0.14,
+          z: -0.08,
+          color: '#3498db',
+          type: 'noun',
+        },
+        {
+          label: 'happiness',
+          x: -0.24,
+          y: 0.04,
+          z: 0.12,
+          color: '#3498db',
+          type: 'noun',
+        },
+        {
+          label: 'run',
+          x: 0.18,
+          y: 0.07,
+          z: 0.03,
+          color: '#e67e22',
+          type: 'verb',
+        },
+        {
+          label: 'jump',
+          x: 0.16,
+          y: 0.11,
+          z: 0.23,
+          color: '#e67e22',
+          type: 'verb',
+        },
+        {
+          label: 'eat',
+          x: 0.09,
+          y: 0.09,
+          z: -0.17,
+          color: '#e67e22',
+          type: 'verb',
+        },
+        {
+          label: 'sleep',
+          x: -0.03,
+          y: 0.03,
+          z: 0.09,
+          color: '#e67e22',
+          type: 'verb',
+        },
+        {
+          label: 'drive',
+          x: 0.16,
+          y: -0.03,
+          z: -0.01,
+          color: '#e67e22',
+          type: 'verb',
+        },
+        {
+          label: 'swim',
+          x: 0.12,
+          y: 0.21,
+          z: 0.08,
+          color: '#e67e22',
+          type: 'verb',
+        },
+        {
+          label: 'think',
+          x: 0.03,
+          y: 0.08,
+          z: -0.17,
+          color: '#e67e22',
+          type: 'verb',
+        },
+        {
+          label: 'laugh',
+          x: -0.11,
+          y: 0.17,
+          z: -0.03,
+          color: '#e67e22',
+          type: 'verb',
+        },
+        {
+          label: 'cry',
+          x: -0.09,
+          y: 0.15,
+          z: -0.19,
+          color: '#e67e22',
+          type: 'verb',
+        },
+        {
+          label: 'build',
+          x: 0.12,
+          y: 0.04,
+          z: -0.04,
+          color: '#e67e22',
+          type: 'verb',
+        },
+      ]
+
+      let trace = {
+        x: dataPoints.map((p) => p.x),
+        y: dataPoints.map((p) => p.y),
+        z: dataPoints.map((p) => p.z),
+        mode: 'markers+text',
+        type: 'scatter3d',
+        text: dataPoints.map((p) => p.label),
+        textposition: 'top center',
+        marker: {
+          size: 8,
+          color: dataPoints.map((p) => p.color),
+          opacity: 0.8,
+        },
+      }
+
+      let layout = {
+        margin: { l: 0, r: 0, b: 0, t: 0 },
+        scene: {
+          xaxis: { title: 'PCA 1' },
+          yaxis: { title: 'PCA 2' },
+          zaxis: { title: 'PCA 3' },
+        },
+      }
+
+      let plotlyConfig = { displayModeBar: false }
+      Plotly.newPlot('vectorPlot', [trace], layout, plotlyConfig)
+    </script>
+  </body>
+</html>
