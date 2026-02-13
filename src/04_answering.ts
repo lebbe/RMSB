@@ -27,7 +27,7 @@ const generator = await pipeline(
   'text-generation',
   'onnx-community/Qwen2.5-1.5B-Instruct',
   {
-    device: 'gpu',
+    device: 'cpu',
     dtype: 'q4', // 4-bit kvantisering sparer minne (og diskplass)
   },
 )

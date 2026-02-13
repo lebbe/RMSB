@@ -5,7 +5,7 @@ console.log(
   'Laster embedding-modellen. Dette kan ta litt tid første gang, så ta en kaffe eller noe.',
 )
 const embedder = await pipeline('feature-extraction', 'Xenova/bge-m3', {
-  device: 'auto',
+  device: 'cpu',
   dtype: 'q8',
 })
 
