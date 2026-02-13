@@ -101,7 +101,7 @@ console.log(`Likhet: ${likhet}`)
 
 # Oppgave 0: Embedding
 
-- `git checkout https://github.com/lebbe/RMSB.git`
+- `git clone https://github.com/lebbe/RMSB.git`
 
 - Lek med eksempelkoden, sjekk semantisk likhet mellom ulike fraser du måtte
   lure på.

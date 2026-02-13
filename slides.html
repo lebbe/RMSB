@@ -99,7 +99,7 @@ env.<span class="hljs-property">backends</span>.<span class="hljs-property">onnx
 <h1 id="oppgave-0-embedding">Oppgave 0: Embedding</h1>
 <ul>
 <li>
-<p><code>git checkout https://github.com/lebbe/RMSB.git</code></p>
+<p><code>git clone https://github.com/lebbe/RMSB.git</code></p>
 </li>
 <li>
 <p>Lek med eksempelkoden, sjekk semantisk likhet mellom ulike fraser du måtte<br />
@@ -396,8 +396,11 @@ som svarer brukeren ved hjelp av alle verktøy vi har bygd så langt.</p>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="27" data-class="invert" data-paginate="true" data-theme="default" lang="en-US" class="invert" data-marpit-pagination="27" style="--class:invert;--paginate:true;--theme:default;" data-marpit-pagination-total="27">
 <h1 id="going-prod">Going prod</h1>
 <ul>
-<li><strong>@pinecone-database/pinecone</strong>: Vektordatabase for prod.</li>
-<li><strong>Vertex AI Search</strong>: Fullstendig RAG-pipeline i Google Cloud.</li>
+<li><strong>pinecone / Weaviate / Qdrant</strong>: Vector-databaser</li>
+<li><strong>pgvector</strong>: Postgres-utvidelse hvis du allerede bruker Postgres</li>
+<li><strong>Vertex AI Search / Azure AI Search</strong>: Fullstendige managed løsninger</li>
+<li><strong>Hybrid search</strong>: Kombiner semantisk + keyword (BM25) for bedre recall</li>
+<li><strong>Reranking</strong>: Re-rank top-k med en annen modell for økt presisjon</li>
 </ul>
 <h1 id="kilder">Kilder</h1>
 <ul>
